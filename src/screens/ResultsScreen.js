@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 const ResultsScreen = ({ quiz, summary, onRestart, onGoHome, styles }) => {
   const scorePercentage = summary.total === 0 ? 0 : Math.round((summary.correct / summary.total) * 100);
@@ -34,12 +34,12 @@ const ResultsScreen = ({ quiz, summary, onRestart, onGoHome, styles }) => {
       )}
 
       <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.secondaryButton} onPress={onRestart}>
+        <Pressable style={styles.secondaryButton} onPress={onRestart}>
           <Text style={styles.secondaryButtonText}>Repetir cuestionario</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryButton} onPress={onGoHome}>
+        </Pressable>
+        <Pressable style={styles.secondaryButton} onPress={onGoHome}>
           <Text style={styles.secondaryButtonText}>Volver al inicio</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );

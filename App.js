@@ -1,19 +1,27 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
-import { forms, DEFAULT_QUESTION_LIMIT } from './src/data/forms';
+import { DEFAULT_QUESTION_LIMIT } from './src/data/forms';
 import { useQuizEngine } from './src/hooks/useQuizEngine';
+import { useFormsData } from './src/hooks/useFormsData';
 
 export default function App() {
+  const { forms, loading, error } = useFormsData();
   const { screen, quiz, summary, answers, start, selectOption, finish, restart, goHome } =
     useQuizEngine(null, DEFAULT_QUESTION_LIMIT);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      {screen === 'home' && <HomeScreen forms={forms} onStartQuiz={start} styles={styles} />}
+      {screen === 'home' && (
+        loading ? (
+          <HomeLoading styles={styles} error={error} />
+        ) : (
+          <HomeScreen forms={forms} onStartQuiz={start} styles={styles} />
+        )
+      )}
       {screen === 'quiz' && quiz && (
         <QuizScreen
           quiz={quiz}
@@ -148,3 +156,13 @@ const styles = StyleSheet.create({
     fontSize: 16
   }
 });
+
+function HomeLoading({ styles, error }) {
+  return (
+    <View style={[styles.screenContainer, { justifyContent: 'center' }]}>
+      <Text style={styles.subtitle}>
+        {error ? `Cargando desde BD falló: ${error}. Usando datos locales...` : 'Cargando formularios...'}
+      </Text>
+    </View>
+  );
+}

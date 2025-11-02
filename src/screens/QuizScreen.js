@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import ProgressBar from '../components/ProgressBar';
 
 const QuizScreen = ({ quiz, answers, onSelectOption, onFinish, styles }) => {
@@ -29,7 +29,7 @@ const QuizScreen = ({ quiz, answers, onSelectOption, onFinish, styles }) => {
         {currentQuestion.options.map((option, index) => {
           const isSelected = currentAnswer?.selectedIndex === index;
           return (
-            <TouchableOpacity
+            <Pressable
               key={option}
               style={[styles.optionButton, isSelected && styles.optionButtonSelected]}
               onPress={() => onSelectOption(currentQuestion.id, index)}
@@ -41,17 +41,17 @@ const QuizScreen = ({ quiz, answers, onSelectOption, onFinish, styles }) => {
               >
                 {option}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>
-      <TouchableOpacity
+      <Pressable
         style={[styles.primaryButton, !currentAnswer && styles.primaryButtonDisabled]}
         disabled={!currentAnswer}
         onPress={goToNext}
       >
         <Text style={styles.primaryButtonText}>{isLastQuestion ? 'Finalizar' : 'Siguiente'}</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

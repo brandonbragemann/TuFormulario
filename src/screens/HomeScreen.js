@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 const HomeScreen = ({ forms, onStartQuiz, styles }) => {
   return (
@@ -19,9 +19,9 @@ const HomeScreen = ({ forms, onStartQuiz, styles }) => {
           <Text style={styles.cardMeta}>
             Preguntas por sesión: {form.questionLimit ?? 'Todas las disponibles'}
           </Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => onStartQuiz(form)}>
+          <Pressable style={styles.primaryButton} onPress={() => onStartQuiz(form)}>
             <Text style={styles.primaryButtonText}>Comenzar cuestionario</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ))}
     </ScrollView>
