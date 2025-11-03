@@ -17,7 +17,7 @@ const runMigrations = (tx) => {
     'PRAGMA user_version',
     [],
     (_, res) => {
-      const userVersion = res?.rows?.item(0)?.user_version || 0;
+      let userVersion = res?.rows?.item(0)?.user_version || 0;
       if (userVersion < 1) {
         tx.executeSql(
           `CREATE TABLE IF NOT EXISTS forms (
@@ -47,8 +47,20 @@ const runMigrations = (tx) => {
             FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE
           );`
         );
-        tx.executeSql('PRAGMA user_version = 1');
+        userVersion = 1;
       }
+      if (userVersion < 2) {
+        tx.executeSql('ALTER TABLE questions ADD COLUMN topic TEXT');
+        userVersion = 2;
+      }
+      if (userVersion < 3) {
+        tx.executeSql('ALTER TABLE questions ADD COLUMN correct_indexes TEXT');
+        tx.executeSql(
+          "UPDATE questions SET correct_indexes = '[' || COALESCE(correct_index, 0) || ']' WHERE correct_indexes IS NULL"
+        );
+        userVersion = 3;
+      }
+      tx.executeSql(`PRAGMA user_version = ${userVersion}`);
     }
   );
 };
@@ -121,8 +133,8 @@ const maybeMigrateFromLegacy = () =>
                   const formId = fRes.insertId;
                   questions.forEach((q, qi) => {
                     tx.executeSql(
-                      'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order) VALUES (?, ?, ?, ?, ?)',
-                      [formId, q.prompt, null, 0, qi],
+                      'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order, topic, correct_indexes) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                      [formId, q.prompt, null, 0, qi, null, '[0]'],
                       (_, qRes) => {
                         const qId = qRes.insertId;
                         q.options.forEach((text, oi) => {
@@ -161,10 +173,26 @@ export const seedFromFormsIfEmpty = async (forms) => {
             (_, fRes) => {
               const formId = fRes.insertId;
               (form.questions || []).forEach((q, qi) => {
-                const correctIndex = typeof q.correctOptionIndex === 'number' ? q.correctOptionIndex : 0;
-                tx.executeSql(
-                  'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order) VALUES (?, ?, ?, ?, ?)',
-                  [formId, q.prompt, q.explanation || null, correctIndex, qi],
+                  const sourceIndexes = Array.isArray(q.correctOptionIndexes)
+                    ? q.correctOptionIndexes
+                    : typeof q.correctOptionIndex === 'number'
+                    ? [q.correctOptionIndex]
+                    : [0];
+                  const normalizedIndexes = Array.from(new Set(sourceIndexes.filter((idx) => Number.isInteger(idx)))).sort(
+                    (a, b) => a - b
+                  );
+                  const primaryIndex = normalizedIndexes.length > 0 ? normalizedIndexes[0] : 0;
+                  tx.executeSql(
+                    'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order, topic, correct_indexes) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [
+                      formId,
+                      q.prompt,
+                      q.explanation || null,
+                      primaryIndex,
+                      qi,
+                      q.topic || null,
+                      JSON.stringify(normalizedIndexes.length > 0 ? normalizedIndexes : [0])
+                    ],
                   (_, qRes) => {
                     const qId = qRes.insertId;
                     (q.options || []).forEach((optText, oi) => {
@@ -232,16 +260,36 @@ export const fetchFormsFromDb = () =>
                     const fQuestions = questions
                       .filter((q) => q.form_id === f.id)
                       .map((q) => {
-                        const opts = (optsByQ.get(q.id) || []).sort(
-                          (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
-                        );
-                        return {
-                          id: String(q.id),
-                          prompt: q.prompt,
-                          options: opts.map((o) => o.text),
-                          correctOptionIndex:
-                            typeof q.correct_index === 'number' ? q.correct_index : 0,
-                          explanation: q.explanation || null
+                      const opts = (optsByQ.get(q.id) || []).sort(
+                        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+                      );
+                      let parsedCorrectIndexes = [];
+                      if (typeof q.correct_indexes === 'string' && q.correct_indexes.length > 0) {
+                        try {
+                          const arr = JSON.parse(q.correct_indexes);
+                          if (Array.isArray(arr)) {
+                            parsedCorrectIndexes = arr
+                              .map((val) => Number(val))
+                              .filter((val) => Number.isInteger(val) && val >= 0);
+                          }
+                        } catch {
+                          parsedCorrectIndexes = [];
+                        }
+                      }
+                      if (parsedCorrectIndexes.length === 0 && typeof q.correct_index === 'number') {
+                        parsedCorrectIndexes = [q.correct_index];
+                      }
+                      parsedCorrectIndexes = Array.from(new Set(parsedCorrectIndexes)).sort((a, b) => a - b);
+                      const primaryCorrect = parsedCorrectIndexes.length > 0 ? parsedCorrectIndexes[0] : 0;
+
+                      return {
+                        id: String(q.id),
+                        prompt: q.prompt,
+                        options: opts.map((o) => o.text),
+                        correctOptionIndexes: parsedCorrectIndexes.length > 0 ? parsedCorrectIndexes : [primaryCorrect],
+                        correctOptionIndex: primaryCorrect,
+                        explanation: q.explanation || null,
+                          topic: q.topic || null
                         };
                       });
                     return {
@@ -264,93 +312,3 @@ export const fetchFormsFromDb = () =>
   });
 
 // Backward-compatible insert: if form with title doesn't exist, creates it; inserts question + up to 4 opciones; correct = 0
-export const insertQuestion = ({ quizName, pregunta, opciones }) =>
-  new Promise((resolve, reject) => {
-    const db = openDb();
-    const opts = Array.isArray(opciones) ? opciones : [];
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          'SELECT id FROM forms WHERE title = ? LIMIT 1',
-          [quizName],
-          (_, r) => {
-            const ensure = (formId) => {
-              tx.executeSql(
-                'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order) VALUES (?, ?, ?, ?, ?)',
-                [formId, pregunta, null, 0, null],
-                (_, qRes) => {
-                  const qId = qRes.insertId;
-                  const to4 = opts.slice(0, 4);
-                  while (to4.length < 4) to4.push('');
-                  to4.forEach((text, i) => {
-                    tx.executeSql(
-                      'INSERT INTO options (question_id, text, sort_order) VALUES (?, ?, ?)',
-                      [qId, text, i]
-                    );
-                  });
-                }
-              );
-            };
-            if (r.rows.length > 0) {
-              ensure(r.rows.item(0).id);
-            } else {
-              tx.executeSql(
-                'INSERT INTO forms (title, description) VALUES (?, ?)',
-                [quizName, null],
-                (_, fRes) => ensure(fRes.insertId)
-              );
-            }
-          }
-        );
-      },
-      (err) => reject(err),
-      () => resolve()
-    );
-  });
-
-// New helpers for explicit normalized writes
-export const insertForm = ({ title, description, questionLimit }) =>
-  new Promise((resolve, reject) => {
-    const db = openDb();
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          'INSERT INTO forms (title, description, question_limit) VALUES (?, ?, ?)',
-          [title, description || null, questionLimit ?? null],
-          (_, res) => resolve(res.insertId)
-        );
-      },
-      (err) => reject(err)
-    );
-  });
-
-export const insertQuestionWithOptions = ({
-  formId,
-  prompt,
-  explanation,
-  options,
-  correctIndex = 0,
-}) =>
-  new Promise((resolve, reject) => {
-    const db = openDb();
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          'INSERT INTO questions (form_id, prompt, explanation, correct_index, sort_order) VALUES (?, ?, ?, ?, ?)',
-          [formId, prompt, explanation || null, correctIndex, null],
-          (_, qRes) => {
-            const qId = qRes.insertId;
-            (options || []).forEach((text, i) => {
-              tx.executeSql(
-                'INSERT INTO options (question_id, text, sort_order) VALUES (?, ?, ?)',
-                [qId, text, i]
-              );
-            });
-            resolve(qId);
-          }
-        );
-      },
-      (err) => reject(err)
-    );
-  });
-

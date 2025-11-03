@@ -9,15 +9,39 @@ const shuffle = (items) => {
   return copy;
 };
 
+const normalizeCorrectIndexes = (question) => {
+  if (Array.isArray(question.correctOptionIndexes) && question.correctOptionIndexes.length > 0) {
+    return Array.from(
+      new Set(
+        question.correctOptionIndexes
+          .map((value) => Number(value))
+          .filter((value) => Number.isInteger(value) && value >= 0)
+      )
+    ).sort((a, b) => a - b);
+  }
+  if (typeof question.correctOptionIndex === 'number') {
+    return [question.correctOptionIndex];
+  }
+  return [0];
+};
+
+const normalizeQuestion = (question) => {
+  const correctOptionIndexes = normalizeCorrectIndexes(question);
+  return {
+    ...question,
+    correctOptionIndexes,
+    correctOptionIndex: correctOptionIndexes[0] ?? 0
+  };
+};
+
 const buildQuiz = (form, questionLimit) => {
-  const questions = questionLimit
-    ? shuffle(form.questions).slice(0, questionLimit)
-    : shuffle(form.questions);
+  const pool = Array.isArray(form.questions) ? form.questions : [];
+  const questions = questionLimit ? shuffle(pool).slice(0, questionLimit) : shuffle(pool);
 
   return {
     formId: form.id,
     title: form.title,
-    questions,
+    questions: questions.map((question) => normalizeQuestion(question)),
     createdAt: Date.now()
   };
 };
@@ -37,17 +61,36 @@ export const useQuizEngine = (initialForm = null, questionLimit) => {
     setScreen('quiz');
   };
 
-  const selectOption = (questionId, selectedIndex) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        selectedIndex,
-        timestamp: Date.now()
+  const toggleOption = (questionId, optionIndex) => {
+    setAnswers((prev) => {
+      const previous = prev[questionId]?.selectedIndexes ?? [];
+      const nextSet = new Set(previous);
+      if (nextSet.has(optionIndex)) {
+        nextSet.delete(optionIndex);
+      } else {
+        nextSet.add(optionIndex);
       }
-    }));
+      const nextSelection = Array.from(nextSet).sort((a, b) => a - b);
+
+      if (nextSelection.length === 0) {
+        const { [questionId]: _removed, ...rest } = prev;
+        return rest;
+      }
+
+      return {
+        ...prev,
+        [questionId]: {
+          selectedIndexes: nextSelection,
+          timestamp: Date.now()
+        }
+      };
+    });
   };
 
-  const finish = () => setScreen('results');
+  const finish = (elapsedSeconds = 0) => {
+    setScreen('results');
+    setQuiz((prev) => (prev ? { ...prev, elapsedSeconds } : prev));
+  };
 
   const restart = () => {
     if (!form) return;
@@ -65,25 +108,60 @@ export const useQuizEngine = (initialForm = null, questionLimit) => {
 
   const summary = useMemo(() => {
     if (!quiz) {
-      return { total: 0, correct: 0, mistakes: [] };
+      return { total: 0, correct: 0, incorrect: 0, mistakes: [], topicInsights: [] };
     }
 
     let correct = 0;
     const mistakes = [];
+    const topicStats = new Map();
+
+    const sameSelection = (a = [], b = []) => {
+      if (!Array.isArray(a) || !Array.isArray(b)) return false;
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i += 1) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    };
 
     quiz.questions.forEach((question) => {
       const response = answers[question.id];
-      if (response?.selectedIndex === question.correctOptionIndex) {
+      const selectedIndexes = response?.selectedIndexes ?? [];
+      const normalizedSelection = Array.from(new Set(selectedIndexes)).sort((a, b) => a - b);
+      const isCorrect = sameSelection(normalizedSelection, question.correctOptionIndexes);
+      if (isCorrect) {
         correct += 1;
       } else {
-        mistakes.push({ question, response });
+        const normalizedResponse = response
+          ? { ...response, selectedIndexes: normalizedSelection }
+          : { selectedIndexes: normalizedSelection };
+        mistakes.push({ question, response: normalizedResponse });
       }
+
+      const topic = question.topic || 'General';
+      const entry = topicStats.get(topic) || { topic, total: 0, correct: 0, incorrect: 0 };
+      entry.total += 1;
+      if (isCorrect) {
+        entry.correct += 1;
+      } else {
+        entry.incorrect += 1;
+      }
+      topicStats.set(topic, entry);
+    });
+
+    const incorrect = mistakes.length;
+    const topicInsights = Array.from(topicStats.values()).sort((a, b) => {
+      if (b.incorrect !== a.incorrect) return b.incorrect - a.incorrect;
+      if (b.total !== a.total) return b.total - a.total;
+      return a.topic.localeCompare(b.topic);
     });
 
     return {
       total: quiz.questions.length,
       correct,
-      mistakes
+      incorrect,
+      mistakes,
+      topicInsights
     };
   }, [answers, quiz]);
 
@@ -93,7 +171,7 @@ export const useQuizEngine = (initialForm = null, questionLimit) => {
     answers,
     summary,
     start,
-    selectOption,
+    toggleOption,
     finish,
     restart,
     goHome

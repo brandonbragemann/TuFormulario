@@ -9,7 +9,7 @@ import { useFormsData } from './src/hooks/useFormsData';
 
 export default function App() {
   const { forms, loading, error } = useFormsData();
-  const { screen, quiz, summary, answers, start, selectOption, finish, restart, goHome } =
+  const { screen, quiz, summary, answers, start, toggleOption, finish, goHome } =
     useQuizEngine(null, DEFAULT_QUESTION_LIMIT);
 
   return (
@@ -26,13 +26,13 @@ export default function App() {
         <QuizScreen
           quiz={quiz}
           answers={answers}
-          onSelectOption={selectOption}
+          onToggleOption={toggleOption}
           onFinish={finish}
           styles={styles}
         />
       )}
       {screen === 'results' && quiz && (
-        <ResultsScreen quiz={quiz} summary={summary} onRestart={restart} onGoHome={goHome} styles={styles} />
+        <ResultsScreen quiz={quiz} summary={summary} onGoHome={goHome} styles={styles} />
       )}
     </SafeAreaView>
   );
@@ -111,10 +111,22 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 16
   },
+  quizHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  quizHeaderInfo: {
+    gap: 4
+  },
   quizTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: 'white'
+  },
+  quizTimer: {
+    fontSize: 12,
+    color: '#D0D4E4'
   },
   quizProgress: {
     fontSize: 14,
@@ -127,10 +139,24 @@ const styles = StyleSheet.create({
     gap: 12,
     flex: 1
   },
+  finishButton: {
+    backgroundColor: '#EA580C',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8
+  },
+  finishButtonText: {
+    color: 'white',
+    fontWeight: '600'
+  },
   questionPrompt: {
     fontSize: 18,
     fontWeight: '600',
     color: 'white'
+  },
+  questionHelper: {
+    fontSize: 12,
+    color: '#D0D4E4'
   },
   optionButton: {
     backgroundColor: '#27304A',
@@ -147,6 +173,14 @@ const styles = StyleSheet.create({
   optionButtonTextSelected: {
     fontWeight: '700'
   },
+  quizActionsRow: {
+    flexDirection: 'row',
+    gap: 12
+  },
+  quizNextButton: {
+    flex: 1,
+    alignItems: 'center'
+  },
   actionsRow: {
     flexDirection: 'row',
     gap: 12
@@ -154,6 +188,65 @@ const styles = StyleSheet.create({
   resultText: {
     color: 'white',
     fontSize: 16
+  },
+  secondaryButtonDisabled: {
+    opacity: 0.5
+  },
+  resultsChartWrapper: {
+    backgroundColor: '#1A2136',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    gap: 12
+  },
+  resultsChartTitle: {
+    color: '#D0D4E4',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  topicInsightsCard: {
+    backgroundColor: '#1A2136',
+    borderRadius: 12,
+    padding: 16,
+    gap: 12
+  },
+  topicInsightsTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600'
+  },
+  topicRow: {
+    gap: 8
+  },
+  topicRowHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  topicRowTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+    flex: 1,
+    paddingRight: 8
+  },
+  topicRowCounter: {
+    color: '#D0D4E4',
+    fontSize: 12
+  },
+  topicRowBar: {
+    height: 8,
+    borderRadius: 9999,
+    backgroundColor: '#27304A',
+    overflow: 'hidden'
+  },
+  topicRowBarFill: {
+    height: '100%',
+    backgroundColor: '#22C55E'
+  },
+  topicRowFooter: {
+    color: '#D0D4E4',
+    fontSize: 12
   }
 });
 
