@@ -13,13 +13,18 @@ const ProgressBar = ({ progress }) => {
 const styles = StyleSheet.create({
   container: {
     height: 8,
-    backgroundColor: '#27304A',
+    backgroundColor: 'rgba(66, 133, 244, 0.15)',
     borderRadius: 9999,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    shadowColor: '#4285F4',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2
   },
   fill: {
     height: '100%',
-    backgroundColor: '#4F46E5'
+    backgroundColor: '#4285F4'
   }
 });
 

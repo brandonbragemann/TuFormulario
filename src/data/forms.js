@@ -1,32 +1,3 @@
-const sampleTopics = ['Unidad 1: Fundamentos', 'Unidad 2: Aplicaciones', 'Unidad 3: Evaluaciones'];
-const trueFalseTopics = ['Unidad A: Conceptos clave', 'Unidad B: Casos practicos'];
-
-const createSampleQuestions = (count) =>
-  Array.from({ length: count }, (_, index) => ({
-    id: `sample-q-${index + 1}`,
-    prompt: `Pregunta ${index + 1}: cual es la respuesta correcta para el formulario de ejemplo?`,
-    options: ['Opcion A', 'Opcion B', 'Opcion C', 'Opcion D'],
-    correctOptionIndexes: [index % 4],
-    correctOptionIndex: index % 4,
-    topic: sampleTopics[index % sampleTopics.length],
-    explanation: `Para la pregunta ${index + 1}, la respuesta correcta es la opcion ${String.fromCharCode(
-      65 + (index % 4)
-    )}. Personaliza este texto con la explicacion de tu formulario.`
-  }));
-
-const createTrueFalseQuestions = (count) =>
-  Array.from({ length: count }, (_, index) => ({
-    id: `tf-q-${index + 1}`,
-    prompt: `Verdadero o falso ${index + 1}: ajusta esta afirmacion segun tu temario especifico.`,
-    options: ['Verdadero', 'Falso'],
-    correctOptionIndexes: [index % 2],
-    correctOptionIndex: index % 2,
-    topic: trueFalseTopics[index % trueFalseTopics.length],
-    explanation: `Amplia esta explicacion para justificar por que la respuesta correcta es ${
-      index % 2 === 0 ? 'Verdadero' : 'Falso'
-    }.`
-  }));
-
 const cloudEngineerAssociateQuestions = [
   {
     id: 'cea-q1',
@@ -1064,23 +1035,6 @@ const cloudEngineerAssociateForm = {
   questionLimit: 50
 };
 
-export const forms = [
-  {
-    id: 'formulario-demo',
-    title: 'Formulario de Ejemplo',
-    description:
-      'Formulario de muestra con 60 preguntas para demostrar el flujo de estudio. Reemplaza o complementa este contenido con tus propios formularios.',
-    questions: createSampleQuestions(60),
-    questionLimit: 50
-  },
-  {
-    id: 'formulario-rapido',
-    title: 'Repaso rapido Verdadero/Falso',
-    description: 'Plantilla ideal para evaluaciones rapidas de conceptos clave en formato verdadero/falso.',
-    questions: createTrueFalseQuestions(40),
-    questionLimit: 20
-  },
-  cloudEngineerAssociateForm
-];
+export const forms = [cloudEngineerAssociateForm];
 
 export const DEFAULT_QUESTION_LIMIT = 50;

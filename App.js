@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, Text, View, ImageBackground } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
@@ -23,13 +23,16 @@ export default function App() {
         )
       )}
       {screen === 'quiz' && quiz && (
-        <QuizScreen
-          quiz={quiz}
-          answers={answers}
-          onToggleOption={toggleOption}
-          onFinish={finish}
-          styles={styles}
-        />
+        <View style={styles.quizWrapper}>
+          <View style={styles.gcpBackground} />
+          <QuizScreen
+            quiz={quiz}
+            answers={answers}
+            onToggleOption={toggleOption}
+            onFinish={finish}
+            styles={styles}
+          />
+        </View>
       )}
       {screen === 'results' && quiz && (
         <ResultsScreen quiz={quiz} summary={summary} onGoHome={goHome} styles={styles} />
@@ -41,51 +44,97 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#101524'
+    backgroundColor: '#0F1419'
+  },
+  quizWrapper: {
+    flex: 1,
+    position: 'relative'
+  },
+  gcpBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#0F1419',
+    pointerEvents: 'none'
   },
   screenContainer: {
     flexGrow: 1,
     padding: 24,
-    gap: 16
+    gap: 16,
+    backgroundColor: '#0F1419'
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: 'white',
-    marginBottom: 8
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textShadowColor: 'rgba(66, 133, 244, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4
   },
   subtitle: {
     fontSize: 16,
-    color: '#D0D4E4'
+    color: '#B0BEC5'
   },
   sectionTitle: {
     marginTop: 16
   },
   card: {
-    backgroundColor: '#1A2136',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    gap: 8
+    gap: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4285F4',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8
+  },
+  cardLogoContainer: {
+    width: 64,
+    height: 64,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 8
+  },
+  cardTitleContainer: {
+    flex: 1
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'white'
+    color: '#202124'
   },
   cardDescription: {
     fontSize: 14,
-    color: '#B8BED2'
+    color: '#5F6368'
   },
   cardMeta: {
     fontSize: 12,
-    color: '#8490A8'
+    color: '#80868B'
   },
   primaryButton: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4285F4',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8
+    marginTop: 8,
+    shadowColor: '#4285F4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4
   },
   primaryButtonDisabled: {
     opacity: 0.6
@@ -95,21 +144,25 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   secondaryButton: {
-    backgroundColor: '#27304A',
+    backgroundColor: 'rgba(66, 133, 244, 0.15)',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#4285F4'
   },
   secondaryButtonText: {
-    color: 'white',
+    color: '#4285F4',
     fontWeight: '500'
   },
   quizContainer: {
     flex: 1,
     padding: 24,
-    gap: 16
+    gap: 16,
+    zIndex: 1,
+    backgroundColor: '#0F1419'
   },
   quizHeader: {
     flexDirection: 'row',
@@ -122,28 +175,43 @@ const styles = StyleSheet.create({
   quizTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: 'white'
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(66, 133, 244, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3
   },
   quizTimer: {
     fontSize: 12,
-    color: '#D0D4E4'
+    color: '#B0BEC5'
   },
   quizProgress: {
     fontSize: 14,
-    color: '#D0D4E4'
+    color: '#B0BEC5'
   },
   questionCard: {
-    backgroundColor: '#1A2136',
+    backgroundColor: 'rgba(26, 33, 54, 0.9)',
     borderRadius: 12,
     padding: 16,
     gap: 12,
-    flex: 1
+    flex: 1,
+    borderTopWidth: 2,
+    borderTopColor: '#EA4335',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4
   },
   finishButton: {
-    backgroundColor: '#EA580C',
+    backgroundColor: '#EA4335',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8
+    borderRadius: 8,
+    shadowColor: '#EA4335',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4
   },
   finishButtonText: {
     color: 'white',
@@ -152,26 +220,32 @@ const styles = StyleSheet.create({
   questionPrompt: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'white'
+    color: '#FFFFFF'
   },
   questionHelper: {
     fontSize: 12,
-    color: '#D0D4E4'
+    color: '#81C784',
+    fontStyle: 'italic'
   },
   optionButton: {
-    backgroundColor: '#27304A',
+    backgroundColor: 'rgba(66, 133, 244, 0.1)',
     borderRadius: 8,
     paddingVertical: 12,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#4285F4'
   },
   optionButtonSelected: {
-    backgroundColor: '#4F46E5'
+    backgroundColor: '#4285F4',
+    borderColor: '#1A73E8'
   },
   optionButtonText: {
-    color: 'white'
+    color: '#4285F4',
+    fontWeight: '500'
   },
   optionButtonTextSelected: {
-    fontWeight: '700'
+    fontWeight: '700',
+    color: 'white'
   },
   quizActionsRow: {
     flexDirection: 'row',
@@ -193,25 +267,29 @@ const styles = StyleSheet.create({
     opacity: 0.5
   },
   resultsChartWrapper: {
-    backgroundColor: '#1A2136',
+    backgroundColor: 'rgba(26, 33, 54, 0.8)',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    gap: 12
+    gap: 12,
+    borderTopWidth: 2,
+    borderTopColor: '#34A853'
   },
   resultsChartTitle: {
-    color: '#D0D4E4',
+    color: '#B0BEC5',
     fontSize: 16,
     fontWeight: '600'
   },
   topicInsightsCard: {
-    backgroundColor: '#1A2136',
+    backgroundColor: 'rgba(26, 33, 54, 0.8)',
     borderRadius: 12,
     padding: 16,
-    gap: 12
+    gap: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FBBC04'
   },
   topicInsightsTitle: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600'
   },
@@ -224,28 +302,28 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   topicRowTitle: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '500',
     flex: 1,
     paddingRight: 8
   },
   topicRowCounter: {
-    color: '#D0D4E4',
+    color: '#B0BEC5',
     fontSize: 12
   },
   topicRowBar: {
     height: 8,
     borderRadius: 9999,
-    backgroundColor: '#27304A',
+    backgroundColor: 'rgba(66, 133, 244, 0.2)',
     overflow: 'hidden'
   },
   topicRowBarFill: {
     height: '100%',
-    backgroundColor: '#22C55E'
+    backgroundColor: '#34A853'
   },
   topicRowFooter: {
-    color: '#D0D4E4',
+    color: '#B0BEC5',
     fontSize: 12
   }
 });

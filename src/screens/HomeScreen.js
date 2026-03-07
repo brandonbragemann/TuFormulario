@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import GoogleLogo from '../components/GoogleLogo';
 
 const HomeScreen = ({ forms, onStartQuiz, styles }) => {
   return (
@@ -11,7 +12,14 @@ const HomeScreen = ({ forms, onStartQuiz, styles }) => {
       </Text>
       {forms.map((form) => (
         <View key={form.id} style={styles.card}>
-          <Text style={styles.cardTitle}>{form.title}</Text>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardLogoContainer}>
+              <GoogleLogo size={56} />
+            </View>
+            <View style={styles.cardTitleContainer}>
+              <Text style={styles.cardTitle}>{form.title}</Text>
+            </View>
+          </View>
           <Text style={styles.cardDescription}>{form.description}</Text>
           <Text style={styles.cardMeta}>
             Total de preguntas disponibles: {form.questions.length}
