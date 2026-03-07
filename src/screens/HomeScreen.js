@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import GoogleLogo from '../components/GoogleLogo';
 
 const HomeScreen = ({ forms, onStartQuiz, styles }) => {
   return (
@@ -11,7 +12,14 @@ const HomeScreen = ({ forms, onStartQuiz, styles }) => {
       </Text>
       {forms.map((form) => (
         <View key={form.id} style={styles.card}>
-          <Text style={styles.cardTitle}>{form.title}</Text>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardLogoContainer}>
+              <GoogleLogo size={56} />
+            </View>
+            <View style={styles.cardTitleContainer}>
+              <Text style={styles.cardTitle}>{form.title}</Text>
+            </View>
+          </View>
           <Text style={styles.cardDescription}>{form.description}</Text>
           <Text style={styles.cardMeta}>
             Total de preguntas disponibles: {form.questions.length}
@@ -19,9 +27,9 @@ const HomeScreen = ({ forms, onStartQuiz, styles }) => {
           <Text style={styles.cardMeta}>
             Preguntas por sesión: {form.questionLimit ?? 'Todas las disponibles'}
           </Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => onStartQuiz(form)}>
+          <Pressable style={styles.primaryButton} onPress={() => onStartQuiz(form)}>
             <Text style={styles.primaryButtonText}>Comenzar cuestionario</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ))}
     </ScrollView>

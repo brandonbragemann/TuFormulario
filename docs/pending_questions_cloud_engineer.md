@@ -1,0 +1,214 @@
+# Preguntas pendientes – Cloud Engineer Associate
+
+Las siguientes preguntas fueron registradas a la espera de asociar sus respuestas correctas y trasladarlas al formulario oficial.
+
+## Conjunto 1
+
+1. What is the fundamental unit of computing in cloud computing?  
+   A. Physical server  
+   B. VM  
+   C. Block  
+   D. Subnet
+2. If you use a cluster that is managed by a cloud provider, which of these will be managed for you by the cloud provider?  
+   A. Monitoring  
+   B. Networking  
+   C. Some security management tasks  
+   D. All of the above
+3. You need serverless computing for file processing and running the backend of a website; which two products can you choose from Google Cloud Platform?  
+   A. Kubernetes Engine and Compute Engine  
+   B. App Engine and Cloud Functions  
+   C. Cloud Functions and Compute Engine  
+   D. Cloud Functions and Kubernetes Engine
+4. You have been asked to design a storage system for a web application that allows users to upload large data files to be analyzed by a business intelligence workflow. The files should be stored in a high-availability storage system. File system functionality is not required. Which storage system in Google Cloud Platform should be used?  
+   A. Block storage  
+   B. Object storage  
+   C. Cache  
+   D. Network File System
+5. All block storage systems use what block size?  
+   A. 4KB  
+   B. 8KB  
+   C. 16KB  
+   D. Block size can vary.
+6. You have been asked to set up network security in a virtual private cloud. Your company wants to have multiple subnetworks and limit traffic between the subnetworks. Which network security control would you use to control the flow of traffic between subnets?  
+   A. Identity access management  
+   B. Router  
+   C. Firewall  
+   D. IP address table
+7. When you create a machine learning service to identify text in an image, what type of servers should you choose to manage compute resources?  
+   A. VMs  
+   B. Clusters of VMs  
+   C. No servers; specialized services are serverless  
+   D. VMs running Linux only
+8. Investing in servers for extended periods of time, such as committing to use servers for three to five years, works well when?  
+   A. A company is just starting up  
+   B. A company can accurately predict server need for an extended period of time  
+   C. A company has a fixed IT budget  
+   D. A company has a variable IT budget
+9. Your company is based in X and will be running a virtual server for Y. What factor determines the unit per minute cost?  
+   A. The time of day the VM is run  
+   B. The characteristics of the server  
+   C. The application you run  
+   D. None of the above
+10. You plan to use Cloud Vision to analyze images and extract text seen in the image. You plan to process between 1,000 and 2,500 images per hour. How many VMs should you allocate to meet peak demand?  
+    A. 1  
+    B. 10  
+    C. 25  
+    D. None; Cloud Vision is a serverless service.
+11. You have to run a number of services to support an application. Which of the following is a good deployment model?  
+    A. Run on a large, single VM  
+    B. Use containers in a managed cluster  
+    C. Use two large VMs, making one of them read only  
+    D. Use a small VM for all services and increase the size of the VM when CPU utilization exceeds 90 percent
+12. You have created a VM. Which of the following system administration operations are you allowed to perform on it?  
+    A. Configure the file system  
+    B. Patch operating system software  
+    C. Change file and directory permissions  
+    D. All of the above
+13. Cloud Filestore is based on what file system technology?  
+    A. Network File System (NFS)  
+    B. XFS  
+    C. EXT4  
+    D. ReiserFS
+14. When setting up a network in GCP, your network the resources in it are treated as what?  
+    A. Virtual private cloud  
+    B. Subdomain  
+    C. Cluster  
+    D. None of the above
+15. You need to store data for X and therefore you are using a cache for Y. How will the cache affect data retrieval?  
+    A. A cache improves the execution of client-side JavaScript.  
+    B. A cache will continue to store data even if power is lost, improving availability.  
+    C. Caches can get out of sync with the system of truth.  
+    D. Using a cache will reduce latency, since retrieving from a cache is faster than retrieving from SSDs or HDDs.
+16. Why can cloud providers offer elastic resource allocation?  
+    A. Cloud providers can take resources from lower-priority customers and give them to higher-priority customers.  
+    B. Extensive resources and the ability to quickly shift resources between customers enables public cloud providers to offer elastic resource allocation more efficiently than can be done in smaller data centers.  
+    C. They charge more the more resources you use.  
+    D. They don’t.
+17. What is not a characteristic of specialized services in Google Cloud Platform?  
+    A. They are serverless; you do not need to configure servers or clusters.  
+    B. They provide a specific function, such as translating text or analyzing images.  
+    C. They require monitoring by the user.  
+    D. They provide an API to access the functionality of the service.
+18. Your client’s transactions must access a drive attached to a VM that allows for random access to parts of files. What kind of storage does the attached drive provide?  
+    A. Object storage  
+    B. Block storage  
+    C. NoSQL storage  
+    D. Only SSD storage
+19. You are deploying a new relational database to support a web application. Which type of storage system would you use to store data files of the database?  
+    A. Object storage  
+    B. Data storage  
+    C. Block storage  
+    D. Cache
+20. A user prefers services that require minimal setup; why would you recommend Cloud Storage, App Engine, and Cloud Functions?  
+    A. They are charged only by time.  
+    B. They are serverless.  
+    C. They require a user to configure VMs.  
+    D. They can only run applications written in Go.
+
+## Conjunto 2
+
+1. You are planning to deploy a SaaS application for customers in North America, Europe, and Asia. To maintain scalability, you will need to distribute workload across servers in multiple regions. Which GCP service would you use to implement the workload distribution?  
+   A. Cloud DNS  
+   B. Cloud Spanner  
+   C. Cloud Load Balancing  
+   D. Cloud CDN
+2. You have decided to deploy a set of microservices using containers. You could install and manage Docker on Compute Engine instances, but you’d rather have GCP provide some container management services. Which two GCP services allow you to run containers in a managed service?  
+   A. App Engine standard environment and App Engine flexible environment  
+   B. Kubernetes Engine and App Engine standard environment  
+   C. Kubernetes Engine and App Engine flexible environment  
+   D. App Engine standard environment and Cloud Functions
+3. Why would an API developer want to use the Apigee API platform?  
+   A. To get the benefits of routing and rate-limiting  
+   B. Authentication services  
+   C. Version control of code  
+   D. A and B  
+   E. All of the above
+4. You are deploying an API to the public Internet and are concerned that your service will be subject to DDoS attacks. Which GCP service should you consider to protect your API?  
+   A. Cloud Armor  
+   B. Cloud CDN  
+   C. Cloud IAM  
+   D. VPCs
+5. You have an application that uses a Pub/Sub message queue to maintain a list of tasks that are to be processed by another application. The application that consumes messages from the Pub/Sub queue removes the message only after completing the task. It takes approximately 10 seconds to complete a task. It is not a problem if two or more VMs perform the same task. What is a cost-effective configuration for processing this workload?  
+   A. Use preemptible VMs  
+   B. Use standard VMs  
+   C. Use DataProc  
+   D. Use Spanner
+6. Your department is deploying an application that has a database backend. You are concerned about the read load on the database server and want to have data available in memory to reduce the time to respond to queries and to reduce the load on the database server. Which GCP service would you use to keep data in memory?  
+   A. Cloud SQL  
+   B. Cloud Memorystore  
+   C. Cloud Spanner  
+   D. Cloud Datastore
+7. The Cloud SDK can be used to configure and manage resources in which of the following services?  
+   A. Compute Engine  
+   B. Cloud Storage  
+   C. Network firewalls  
+   D. All of the above
+8. What server configuration is required to use Cloud Functions?  
+   A. VM configuration  
+   B. Cluster configuration  
+   C. Pub/Sub configuration  
+   D. None
+9. You have been assigned the task of consolidating log data generated by each instance of an application. Which of the Stackdriver management tools would you use?  
+   A. Monitoring  
+   B. Trace  
+   C. Debugger  
+   D. Logging
+10. Which specialized services are most likely to be used to build a data warehousing platform that requires complex extraction, transformation, and loading operations on batch data as well as processing streaming data?  
+    A. Apigee API platform  
+    B. Data analytics  
+    C. AI and machine learning  
+    D. Cloud SDK
+11. Your company has deployed 100,000 Internet of Things (IoT) sensors to collect data on the state of equipment in several factories. Each sensor will collect and send data to a data store every 5 seconds. Sensors will run continuously. Daily reports will produce data on the maximum, minimum, and average value for each metric collected on each sensor. There is no need to support transactions in this application. Which database product would you recommend?  
+    A. Cloud Spanner  
+    B. Cloud Bigtable  
+    C. Cloud SQL MySQL  
+    D. Cloud SQL PostgreSQL
+12. You are the lead developer on a medical application that uses patients’ smartphones to capture biometric data. The app is required to collect data and store it on the smartphone when data cannot be reliably transmitted to the backend application. You want to minimize the amount of development you have to do to keep data synchronized between smartphones and backend data stores. Which data store option should you recommend?  
+    A. Cloud Firestore  
+    B. Cloud Spanner  
+    C. Cloud Datastore  
+    D. Cloud SQL
+13. A software engineer comes to you for a recommendation. She has implemented a machine learning algorithm to identify cancerous cells in medical images. The algorithm is computationally intensive, makes many mathematical calculations, requires immediate access to large amounts of data, and cannot be easily distributed over multiple servers. What kind of Compute Engine configuration would you recommend?  
+    A. High memory, high CPU  
+    B. High memory, high CPU, GPU  
+    C. Mid-level memory, high CPU  
+    D. High CPU, GPU
+14. You are tasked with mapping the authentication and authorization policies of your on-premises applications to GPC’s authentication and authorization mechanisms. The GCP documentation states that an identity must be authenticated in order to grant privileges to that identity. What does the term identity refer to?  
+    A. VM ID  
+    B. User  
+    C. Role  
+    D. Set of privileges
+15. A client is developing an application that will need to analyze large volumes of text information. The client is not expert in text mining or working with language. What GCP service would you recommend they use?  
+    A. Cloud Vision  
+    B. Cloud ML  
+    C. Cloud Natural Language Processing  
+    D. Cloud Text Miner
+16. Data scientists in your company want to use a machine learning library available only in Apache Spark. They want to minimize the amount of administration and DevOps work. How would you recommend they proceed?  
+    A. Use Cloud Spark  
+    B. Use Cloud Dataproc  
+    C. Use BigQuery  
+    D. Install Apache Spark on a cluster of VMs
+17. Database designers at your company are debating the best way to move a database to GCP. The database supports an application with a global user base. Users expect support for transactions and the ability to query data using commonly used query tools. The database designers decide that any database service they choose will need to support ANSI 2011 and global transactions. Which database service would you recommend?  
+    A. Cloud SQL  
+    B. Cloud Spanner  
+    C. Cloud Datastore  
+    D. Cloud Bigtable
+18. Which specialized service supports both batch and stream processing workflows?  
+    A. Cloud Dataproc  
+    B. BigQuery  
+    C. Cloud Datastore  
+    D. AutoML
+19. You have a Python application you’d like to run in a scalable environment with the least amount of management overhead. Which GCP product would you select?  
+    A. App Engine flexible environment  
+    B. Cloud Engine  
+    C. App Engine standard environment  
+    D. Kubernetes Engine
+20. A product manager at your company reports that customers are complaining about the reliability of one of your applications. The application is crashing periodically, but developers have not found a common pattern that triggers the crashes. They are concerned that they do not have good insight into the behavior of the application and want to perform a detailed review of all crash data. Which Stackdriver tool would you use to view consolidated crash information?  
+    A. Dataproc  
+    B. Monitoring  
+    C. Logging  
+    D. Error Reporting
+
+## Conjunto 3
+
+Preguntas integradas al formulario principal (IDs `cea-q72` a `cea-q91`).
