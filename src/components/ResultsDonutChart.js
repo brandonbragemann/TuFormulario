@@ -4,13 +4,31 @@ import Svg, { Circle } from 'react-native-svg';
 
 const ResultsDonutChart = ({ correct, incorrect, size = 200, strokeWidth = 18 }) => {
   const { total, correctRatio, incorrectRatio, circumference, radius } = useMemo(() => {
-    const totalResponses = correct + incorrect;
+    const safeCorrect = Number.isFinite(correct) ? Math.max(0, correct) : 0;
+    const safeIncorrect = Number.isFinite(incorrect) ? Math.max(0, incorrect) : 0;
+    const totalResponses = safeCorrect + safeIncorrect;
     const radiusValue = (size - strokeWidth) / 2;
     const circumferenceValue = 2 * Math.PI * radiusValue;
+
+    if (totalResponses <= 0) {
+      return {
+        total: 0,
+        correctRatio: 0,
+        incorrectRatio: 0,
+        circumference: circumferenceValue,
+        radius: radiusValue
+      };
+    }
+
+    const rawCorrectRatio = safeCorrect / totalResponses;
+    const rawIncorrectRatio = safeIncorrect / totalResponses;
+    const ratioSum = rawCorrectRatio + rawIncorrectRatio || 1;
+    const normalizedCorrect = rawCorrectRatio / ratioSum;
+    const normalizedIncorrect = rawIncorrectRatio / ratioSum;
     return {
       total: totalResponses,
-      correctRatio: totalResponses === 0 ? 0 : correct / totalResponses,
-      incorrectRatio: totalResponses === 0 ? 0 : incorrect / totalResponses,
+      correctRatio: normalizedCorrect,
+      incorrectRatio: normalizedIncorrect,
       circumference: circumferenceValue,
       radius: radiusValue
     };
@@ -18,6 +36,18 @@ const ResultsDonutChart = ({ correct, incorrect, size = 200, strokeWidth = 18 })
 
   const correctStroke = correctRatio * circumference;
   const incorrectStroke = incorrectRatio * circumference;
+  const correctPercent = total === 0 ? 0 : Math.round(correctRatio * 100);
+  const incorrectPercent = total === 0 ? 0 : 100 - correctPercent;
+  const shouldRenderCorrect = total > 0 && correctRatio > 0;
+  const shouldRenderIncorrect = total > 0 && incorrectRatio > 0;
+  const startOffset = circumference * 0.25;
+  const normalizeOffset = (value) => {
+    if (circumference === 0) return 0;
+    const normalized = value % circumference;
+    return normalized < 0 ? normalized + circumference : normalized;
+  };
+  const correctOffset = normalizeOffset(startOffset);
+  const incorrectOffset = normalizeOffset(startOffset - correctStroke);
 
   return (
     <View style={styles.chartContainer}>
@@ -31,28 +61,28 @@ const ResultsDonutChart = ({ correct, incorrect, size = 200, strokeWidth = 18 })
             strokeWidth={strokeWidth}
             fill="none"
           />
-          {correctRatio > 0 && (
+          {shouldRenderCorrect && (
             <Circle
               stroke="#22C55E"
               cx={size / 2}
               cy={size / 2}
               r={radius}
               strokeWidth={strokeWidth}
-              strokeDasharray={`${correctStroke} ${circumference}`}
-              strokeDashoffset={circumference * 0.25}
+              strokeDasharray={`${correctStroke} ${circumference - correctStroke}`}
+              strokeDashoffset={correctOffset}
               strokeLinecap="round"
               fill="none"
             />
           )}
-          {incorrectRatio > 0 && (
+          {shouldRenderIncorrect && (
             <Circle
               stroke="#EF4444"
               cx={size / 2}
               cy={size / 2}
               r={radius}
               strokeWidth={strokeWidth}
-              strokeDasharray={`${incorrectStroke} ${circumference}`}
-              strokeDashoffset={circumference * 0.25 - correctStroke}
+              strokeDasharray={`${incorrectStroke} ${circumference - incorrectStroke}`}
+              strokeDashoffset={incorrectOffset}
               strokeLinecap="round"
               fill="none"
             />
@@ -60,23 +90,30 @@ const ResultsDonutChart = ({ correct, incorrect, size = 200, strokeWidth = 18 })
         </Svg>
         <View style={styles.chartCenterContent}>
           <Text style={styles.chartCenterValue}>
-            {total === 0 ? '0%' : `${Math.round(correctRatio * 100)}%`}
+            {total === 0 ? '0%' : `${correctPercent}%`}
           </Text>
           <Text style={styles.chartCenterLabel}>aciertos</Text>
         </View>
       </View>
       <View style={styles.legend}>
-        <ChartLegendItem color="#22C55E" label={`Aciertos (${correct})`} />
-        <ChartLegendItem color="#EF4444" label={`Incorrectos (${incorrect})`} />
+        <ChartLegendItem color="#22C55E" label="Aciertos" count={correct} percent={correctPercent} />
+        <ChartLegendItem
+          color="#EF4444"
+          label="Incorrectos"
+          count={incorrect}
+          percent={incorrectPercent}
+        />
       </View>
     </View>
   );
 };
 
-const ChartLegendItem = ({ color, label }) => (
+const ChartLegendItem = ({ color, label, count, percent }) => (
   <View style={styles.legendItem}>
     <View style={[styles.legendSwatch, { backgroundColor: color }]} />
-    <Text style={styles.legendLabel}>{label}</Text>
+    <Text style={styles.legendLabel}>
+      {label} ({count}) - {percent}%
+    </Text>
   </View>
 );
 
