@@ -1,36 +1,107 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import ResultsDonutChart from '../components/ResultsDonutChart';
+import GoogleLogo from '../components/GoogleLogo';
 
-const ResultsScreen = ({ quiz, summary, onGoHome, styles }) => {
+const MAX_HISTORY_ITEMS = 5;
+
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return 'Sin registro';
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return 'Sin registro';
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${day}/${month} ${hours}:${minutes}`;
+};
+
+const formatDuration = (totalSeconds = 0) => {
+  const minutes = Math.floor(totalSeconds / 60)
+    .toString()
+    .padStart(2, '0');
+  const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+};
+
+const ResultsScreen = ({ quiz, summary, attempts = [], onGoHome, styles }) => {
   const [showCorrections, setShowCorrections] = useState(false);
   const scorePercentage = summary.total === 0 ? 0 : Math.round((summary.correct / summary.total) * 100);
   const topicInsights = summary.topicInsights ?? [];
   const highlightedTopics = topicInsights.slice(0, 5);
-
-  const formattedTime = useMemo(() => {
-    const totalSeconds = quiz?.elapsedSeconds ?? 0;
-    const minutes = Math.floor(totalSeconds / 60)
-      .toString()
-      .padStart(2, '0');
-    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  }, [quiz?.elapsedSeconds]);
+  const formattedTime = useMemo(
+    () => formatDuration(quiz?.elapsedSeconds ?? 0),
+    [quiz?.elapsedSeconds]
+  );
+  const historyEntries = useMemo(
+    () => (Array.isArray(attempts) ? attempts.slice(0, MAX_HISTORY_ITEMS) : []),
+    [attempts]
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.screenContainer}>
       <Text style={styles.title}>Resultados</Text>
-      <View style={styles.card}>
-        <Text style={styles.resultText}>Aciertos: {summary.correct}</Text>
-        <Text style={styles.resultText}>Incorrectos: {summary.incorrect}</Text>
-        <Text style={styles.resultText}>Tiempo: {formattedTime}</Text>
-        <Text style={styles.resultText}>Puntaje: {scorePercentage}%</Text>
+      <View style={styles.resultsSummaryCard}>
+        <View style={styles.resultsSummaryHeader}>
+          <View style={styles.resultsSummaryImage}>
+            <GoogleLogo size={56} />
+          </View>
+          <View style={styles.resultsSummaryInfo}>
+            <Text style={styles.resultsSummaryTitle}>{quiz?.title ?? 'Formulario'}</Text>
+            <Text style={styles.resultsSummarySubtitle}>Intento completado</Text>
+          </View>
+        </View>
+        <View style={styles.resultsSummaryStats}>
+          <View style={styles.resultsSummaryStat}>
+            <Text style={styles.resultsSummaryStatLabel}>Aciertos</Text>
+            <Text style={styles.resultsSummaryStatValue}>{summary.correct}</Text>
+          </View>
+          <View style={styles.resultsSummaryStat}>
+            <Text style={styles.resultsSummaryStatLabel}>Incorrectos</Text>
+            <Text style={styles.resultsSummaryStatValue}>{summary.incorrect}</Text>
+          </View>
+          <View style={styles.resultsSummaryStat}>
+            <Text style={styles.resultsSummaryStatLabel}>Tiempo</Text>
+            <Text style={styles.resultsSummaryStatValue}>{formattedTime}</Text>
+          </View>
+          <View style={styles.resultsSummaryStat}>
+            <Text style={styles.resultsSummaryStatLabel}>Puntaje</Text>
+            <Text style={styles.resultsSummaryStatValue}>{scorePercentage}%</Text>
+          </View>
+        </View>
       </View>
 
       {!showCorrections && (
         <View style={styles.resultsChartWrapper}>
           <Text style={styles.resultsChartTitle}>Resumen visual</Text>
           <ResultsDonutChart correct={summary.correct} incorrect={summary.incorrect} />
+          <View style={styles.resultsHistory}>
+            <Text style={styles.resultsHistoryTitle}>Intentos anteriores</Text>
+            {historyEntries.length === 0 ? (
+              <Text style={styles.resultsHistoryEmpty}>
+                AÃºn no registras intentos anteriores para este formulario.
+              </Text>
+            ) : (
+              historyEntries.map((attempt) => (
+                <View key={attempt.quizId} style={styles.resultsHistoryRow}>
+                  <View style={styles.resultsHistoryRowLeft}>
+                    <Text style={styles.resultsHistoryRowLabel}>
+                      {attempt.formTitle ?? quiz?.title}
+                    </Text>
+                    <Text style={styles.resultsHistoryRowMeta}>
+                      {formatTimestamp(attempt.completedAt)} - Tiempo {formatDuration(attempt.elapsedSeconds)}
+                    </Text>
+                  </View>
+                  <View style={styles.resultsHistoryRowRight}>
+                    <Text style={styles.resultsHistoryScore}>{attempt.percentage}%</Text>
+                    <Text style={styles.resultsHistoryRowMeta}>
+                      {attempt.correct}/{attempt.total} aciertos
+                    </Text>
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
         </View>
       )}
 

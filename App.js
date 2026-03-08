@@ -9,7 +9,7 @@ import { useFormsData } from './src/hooks/useFormsData';
 
 export default function App() {
   const { forms, loading, error } = useFormsData();
-  const { screen, quiz, summary, answers, start, toggleOption, finish, goHome } =
+  const { screen, quiz, summary, answers, attempts, start, toggleOption, finish, goHome } =
     useQuizEngine(null, DEFAULT_QUESTION_LIMIT);
 
   return (
@@ -35,7 +35,13 @@ export default function App() {
         </View>
       )}
       {screen === 'results' && quiz && (
-        <ResultsScreen quiz={quiz} summary={summary} onGoHome={goHome} styles={styles} />
+        <ResultsScreen
+          quiz={quiz}
+          summary={summary}
+          attempts={attempts}
+          onGoHome={goHome}
+          styles={styles}
+        />
       )}
     </SafeAreaView>
   );
@@ -164,6 +170,19 @@ const styles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: '#0F1419'
   },
+  quizBody: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 16
+  },
+  quizBodyStacked: {
+    flexDirection: 'column'
+  },
+  quizMainColumn: {
+    flex: 1,
+    gap: 16
+  },
   quizHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,6 +220,51 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4
+  },
+  feedbackCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    gap: 8,
+    borderLeftWidth: 4
+  },
+  feedbackCardCorrect: {
+    backgroundColor: 'rgba(52, 168, 83, 0.2)',
+    borderLeftColor: '#34A853'
+  },
+  feedbackCardIncorrect: {
+    backgroundColor: 'rgba(234, 67, 53, 0.2)',
+    borderLeftColor: '#EA4335'
+  },
+  feedbackTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  feedbackLabel: {
+    color: '#B0BEC5',
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5
+  },
+  feedbackSection: {
+    marginTop: 4,
+    gap: 4
+  },
+  feedbackCorrectOption: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500'
+  },
+  feedbackIncorrectOption: {
+    color: '#FFCDD2',
+    fontSize: 14,
+    fontWeight: '500'
+  },
+  feedbackExplanation: {
+    color: '#B0BEC5',
+    fontSize: 13,
+    lineHeight: 18
   },
   finishButton: {
     backgroundColor: '#EA4335',
@@ -255,6 +319,74 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center'
   },
+  timelineContainer: {
+    width: 170,
+    backgroundColor: 'rgba(26, 33, 54, 0.85)',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    gap: 12,
+    flexShrink: 0,
+    maxHeight: '100%'
+  },
+  timelineContainerStacked: {
+    width: '100%',
+    marginTop: 16
+  },
+  timelineTitle: {
+    color: '#B0BEC5',
+    fontSize: 14,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5
+  },
+  timelineList: {
+    flexGrow: 1
+  },
+  timelineListContent: {
+    gap: 8,
+    paddingBottom: 4,
+    paddingTop: 4
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 48
+  },
+  timelineBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#4A4F58',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8
+  },
+  timelineBadgeCorrect: {
+    borderColor: '#34A853',
+    backgroundColor: 'rgba(52, 168, 83, 0.15)'
+  },
+  timelineBadgeIncorrect: {
+    borderColor: '#EA4335',
+    backgroundColor: 'rgba(234, 67, 53, 0.15)'
+  },
+  timelineBadgeActive: {
+    borderColor: '#FBBC04'
+  },
+  timelineBadgeText: {
+    color: '#FFFFFF',
+    fontWeight: '600'
+  },
+  timelineTime: {
+    color: '#FFFFFF',
+    fontSize: 14
+  },
+  timelineTimeMuted: {
+    color: '#5F6368'
+  },
   actionsRow: {
     flexDirection: 'row',
     gap: 12
@@ -275,10 +407,116 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: '#34A853'
   },
+  resultsSummaryCard: {
+    backgroundColor: 'rgba(26, 33, 54, 0.9)',
+    borderRadius: 12,
+    padding: 16,
+    gap: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4285F4'
+  },
+  resultsSummaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  },
+  resultsSummaryImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: 'rgba(15, 20, 25, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  resultsSummaryInfo: {
+    flex: 1
+  },
+  resultsSummaryTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600'
+  },
+  resultsSummarySubtitle: {
+    color: '#B0BEC5',
+    fontSize: 12
+  },
+  resultsSummaryStats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between'
+  },
+  resultsSummaryStat: {
+    flexBasis: '48%',
+    flexGrow: 1,
+    backgroundColor: 'rgba(15, 20, 25, 0.7)',
+    borderRadius: 8,
+    padding: 12,
+    gap: 4
+  },
+  resultsSummaryStatLabel: {
+    color: '#B0BEC5',
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1
+  },
+  resultsSummaryStatValue: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600'
+  },
   resultsChartTitle: {
     color: '#B0BEC5',
     fontSize: 16,
     fontWeight: '600'
+  },
+  resultsHistory: {
+    width: '100%',
+    backgroundColor: 'rgba(15, 20, 25, 0.6)',
+    borderRadius: 12,
+    padding: 12,
+    gap: 8
+  },
+  resultsHistoryTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  resultsHistoryEmpty: {
+    color: '#B0BEC5',
+    fontSize: 14
+  },
+  resultsHistoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(26, 33, 54, 0.6)',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    gap: 12
+  },
+  resultsHistoryRowLeft: {
+    flex: 1,
+    gap: 2
+  },
+  resultsHistoryRowRight: {
+    alignItems: 'flex-end',
+    minWidth: 96
+  },
+  resultsHistoryRowLabel: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500'
+  },
+  resultsHistoryRowMeta: {
+    color: '#B0BEC5',
+    fontSize: 12
+  },
+  resultsHistoryScore: {
+    color: '#34A853',
+    fontSize: 20,
+    fontWeight: '700'
   },
   topicInsightsCard: {
     backgroundColor: 'rgba(26, 33, 54, 0.8)',

@@ -1032,9 +1032,9 @@ const cloudEngineerAssociateForm = {
   description:
     'Formulario orientado a la certificacion Google Cloud Associate Cloud Engineer. Incluye escenarios de almacenamiento, redes, IAM y automatizacion.',
   questions: cloudEngineerAssociateQuestions,
-  questionLimit: 50
+  questionLimit: 35
 };
 
 export const forms = [cloudEngineerAssociateForm];
 
-export const DEFAULT_QUESTION_LIMIT = 50;
+export const DEFAULT_QUESTION_LIMIT = 35;
